@@ -22,10 +22,10 @@ class Initial extends AbstractMigration
                 'limit' => null,
                 'null' => true,
             ])
-            ->addColumn('updated', 'timestamp', [
-                'default' => null,
+            ->addColumn('modified', 'timestamp', [
+                'default' => '0000-00-00 00:00:00',
                 'limit' => null,
-                'null' => true,
+                'null' => false,
             ])
             ->create();
 
@@ -61,10 +61,10 @@ class Initial extends AbstractMigration
                 'limit' => 32,
                 'null' => true,
             ])
-            ->addColumn('updated', 'timestamp', [
-                'default' => null,
+            ->addColumn('modified', 'timestamp', [
+                'default' => 'CURRENT_TIMESTAMP',
                 'limit' => null,
-                'null' => true,
+                'null' => false,
             ])
             ->addColumn('created', 'timestamp', [
                 'default' => null,
@@ -138,10 +138,10 @@ class Initial extends AbstractMigration
                 'limit' => null,
                 'null' => true,
             ])
-            ->addColumn('updated', 'timestamp', [
-                'default' => null,
+            ->addColumn('modified', 'timestamp', [
+                'default' => '0000-00-00 00:00:00',
                 'limit' => null,
-                'null' => true,
+                'null' => false,
             ])
             ->addColumn('content_key', 'string', [
                 'default' => null,
@@ -201,10 +201,10 @@ class Initial extends AbstractMigration
                 'limit' => null,
                 'null' => true,
             ])
-            ->addColumn('updated', 'timestamp', [
-                'default' => null,
+            ->addColumn('modified', 'timestamp', [
+                'default' => '0000-00-00 00:00:00',
                 'limit' => null,
-                'null' => true,
+                'null' => false,
             ])
             ->addIndex(
                 [

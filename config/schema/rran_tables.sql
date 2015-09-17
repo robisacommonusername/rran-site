@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
   phone varchar(31),
   is_admin boolean,
   created timestamp,
-  updated timestamp,
+  modified timestamp,
   PRIMARY KEY (id)
 );
 CREATE UNIQUE INDEX on users(username);
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS inventoryitems (
   user_id integer,
   description text,
   created timestamp,
-  updated timestamp,
+  modified timestamp,
   PRIMARY KEY (id)
 );
 CREATE INDEX on inventoryitems(user_id);
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS uploadedfiles (
   private boolean default false,
   content_key varchar(32),
   created timestamp,
-  updated timestamp,
+  modified timestamp,
   PRIMARY KEY (id)
 );
 
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS minutes (
   content_key varchar(32),
   content text,
   created timestamp,
-  updated timestamp,
+  modified timestamp,
   PRIMARY KEY (id)
 );
 CREATE UNIQUE INDEX on minutes(meeting_date);
