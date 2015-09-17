@@ -37,8 +37,8 @@
 				<?php foreach($items as $item) { ?>
 					<tr>
 						<td><?= h($item->description) ?></td>
-						<td><?= $this->Html->link(h($item->user->displayName()), 
-							['controller' => 'Users', 'action' => 'view', $item->user->id]); ?>
+						<td><?= $item->has('user') ? $this->Html->link(h($item->user->displayName()), 
+							['controller' => 'Users', 'action' => 'view', $item->user->id]) : 'No owner'; ?>
 						</td>
 					</tr>
 				<?php } ?>
