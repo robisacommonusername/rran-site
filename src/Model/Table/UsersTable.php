@@ -28,7 +28,9 @@ class UsersTable extends Table
         $this->table('users');
         $this->displayField('username');
         $this->primaryKey('id');
-
+		
+		$this->addBehavior('Timestamp');
+		
         $this->hasMany('Inventoryitems', [
             'foreignKey' => 'user_id'
         ]);

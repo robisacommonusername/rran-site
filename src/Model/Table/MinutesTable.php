@@ -27,6 +27,8 @@ class MinutesTable extends Table
         $this->table('minutes');
         $this->displayField('id');
         $this->primaryKey('id');
+        
+        $this->addBehavior('Timestamp');
 
     }
 

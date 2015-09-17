@@ -45,7 +45,7 @@ class HomeController extends AppController{
 		$files = $this->Uploadedfiles->find('all', ['contain' => ['Tags']])
 			->where(['Uploadedfiles.modified >' => $d])
 			->order(['Uploadedfiles.modified' => 'desc']);
-		$users = $this->Users->find()
+		$users = $this->Users->find('all')
 			->where(['created >' => $d]);
 		$this->set(compact('minutes','items','users','files'));
 	}
