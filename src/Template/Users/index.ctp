@@ -28,9 +28,9 @@
             <td><?= $user->is_admin ? 'Yes' : 'No' ?></td>
             <td class="actions">
                 <?= $this->Html->link(__('Edit'), ['action' => 'edit', $user->id]) ?>
-                <? if ($userData['is_admin']) { ?>
+                <?php if ($userData['is_admin']) { ?>
 					<?= $this->Form->postLink(__('Delete'), ['action' => 'delete', $user->id], ['confirm' => __('Are you sure you want to delete # {0}?', $user->id)]) ?>
-				<? } ?>
+				<?php } ?>
             </td>
         </tr>
 

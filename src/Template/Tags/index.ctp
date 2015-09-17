@@ -19,8 +19,8 @@
 <div class="tags index large-10 medium-9 columns">
 	<?= $this->Search->searchBox(['label' => 'Search for tag']); ?>
 	<div id="accordion">
-	<? foreach ($tags as $tag) { ?>
-		<? if (!empty($tag->uploadedfiles)) { ?>
+	<?php foreach ($tags as $tag) { ?>
+		<?php if (!empty($tag->uploadedfiles)) { ?>
 			<h4><?= h($tag->label) ?></h4>
 			<div>
 		    <table cellpadding="0" cellspacing="0">
@@ -34,7 +34,7 @@
 		        </tr>
 		    </thead>
 			<tbody>
-			<? foreach ($tag->uploadedfiles as $uploadedfile) { ?>
+			<?php foreach ($tag->uploadedfiles as $uploadedfile) { ?>
 				<tr>
 					<td><?= $this->Html->link(h($uploadedfile->file_name),
 					['controller' => 'Uploadedfiles','action' => 'view', $uploadedfile->id]) ?></td>
@@ -46,12 +46,12 @@
 		                <?= $this->Form->postLink(__('Delete'), ['action' => 'delete', $uploadedfile->id], ['confirm' => __('Are you sure you want to delete # {0}?', $uploadedfile->id)]) ?>
 		            </td>
 				</tr>
-			<? } ?>
+			<?php } ?>
 		    </tbody>
 		    </table>
 			</div>
-		<? } ?>
-	<? } ?>
+		<?php } ?>
+	<?php } ?>
     </div>
     <div class="paginator">
         <ul class="pagination">

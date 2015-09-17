@@ -6,9 +6,9 @@
         <li><?= $this->Html->link(__('Meeting Minutes'), ['controller' => 'Minutes', 'action' => 'index']) ?></li>
         <li><?= $this->Html->link(__('Uploaded files (shared drive)'), ['controller' => 'Uploadedfiles', 'action' => 'index']) ?></li>
         <li><?= $this->Html->link(__('Edit your contact information'), ['controller' => 'Users', 'action' => 'edit', $userData['id']]) ?></li>
-        <? if ($userData['is_admin']) { ?>
+        <?php if ($userData['is_admin']) { ?>
 			<li><?= $this->Html->link(__('Manage users'), ['controller' => 'Users', 'action' => 'index']); ?></li>
-        <? } ?>
+        <?php } ?>
     </ul>
 </div>
 

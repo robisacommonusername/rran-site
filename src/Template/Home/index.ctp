@@ -6,25 +6,25 @@
 <div class="medium-9 large-10 columns">
 	<h2>Recent events</h2>
 	
-	<? if (!$minutes->isEmpty()) { ?>
+	<?php if (!$minutes->isEmpty()) { ?>
 		<h3>Minutes</h3>
 		<table>
 			<thead>
 				<tr><th>Meeting date</th></tr>
 			</thead>
 			<tbody>
-				<? foreach($minutes as $minute) { ?>
+				<?php foreach($minutes as $minute) { ?>
 					<tr>
 						<td><?= $this->Html->link(h($minute->meeting_date), 
 							['controller' => 'Minutes', 'action' => 'view', $minute->id]); ?>
 						</td>
 					</tr>
-				<? } ?>
+				<?php } ?>
 			</tbody>
 		</table>
-	<? } ?>
+	<?php } ?>
 	
-	<? if (!$items->isEmpty()) { ?>
+	<?php if (!$items->isEmpty()) { ?>
 		<h3>New and changed inventory items</h3>
 		<table>
 			<thead>
@@ -34,19 +34,19 @@
 				</tr>
 			</thead>
 			<tbody>
-				<? foreach($items as $item) { ?>
+				<?php foreach($items as $item) { ?>
 					<tr>
 						<td><?= h($item->description) ?></td>
 						<td><?= $this->Html->link(h($item->user->displayName()), 
 							['controller' => 'Users', 'action' => 'view', $item->user->id]); ?>
 						</td>
 					</tr>
-				<? } ?>
+				<?php } ?>
 			</tbody>
 		</table>
-	<? } ?>
+	<?php } ?>
 	
-	<? if (!$files->isEmpty()) { ?>
+	<?php if (!$files->isEmpty()) { ?>
 		<h3>Files uploaded</h3>
 		<table>
 			<thead>
@@ -57,7 +57,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<? foreach($files as $file) { ?>
+				<?php foreach($files as $file) { ?>
 					<tr>
 						<td>
 							<?= $this->Html->link(h($file->file_name),
@@ -70,12 +70,12 @@
 							<?= $this->Tag->tagLinks($file->tags) ?>
 						</td>
 					</tr>
-				<? } ?>
+				<?php } ?>
 			</tbody>
 		</table>
-	<? } ?>
+	<?php } ?>
 	
-	<? if (!$users->isEmpty()) { ?>
+	<?php if (!$users->isEmpty()) { ?>
 		<h3>New users</h3>
 		<table>
 			<thead>
@@ -87,7 +87,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<? foreach($users as $user) { ?>
+				<?php foreach($users as $user) { ?>
 					<tr>
 						<td><?= $this->Html->link(h($user->username),
 							['controller' => 'Users', 'action' => 'view', $user->id])
@@ -96,9 +96,9 @@
 						<td><?= h($user->email) ?></td>
 						<td><?= h($user->phone) ?></td>
 					</tr>
-				<? } ?>
+				<?php } ?>
 			</tbody>
 		</table>
-	<? } ?>
+	<?php } ?>
 </div>
 
