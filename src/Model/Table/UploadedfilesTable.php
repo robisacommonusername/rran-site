@@ -75,7 +75,14 @@ class UploadedfilesTable extends Table
 		}
 		
 		protected function _buildTags($tagString){
-		    $new = array_unique(array_map('trim', explode(',', $tagString)));
+			//divide tag string using ',' as separator
+			$segments = array_map('trim', explode(',', $tagString));
+			//filter out empty entries (often caused by trailing comma)
+			//and take only unique tags
+			$new = array_unique(array_filter($segments, function($x){
+				return ($x !== '');
+			}));
+
 		    $out = [];
 		    $query = $this->Tags->find()
 		        ->where(['Tags.label IN' => $new]);

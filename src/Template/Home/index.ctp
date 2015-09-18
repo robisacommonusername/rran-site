@@ -15,7 +15,7 @@
 			<tbody>
 				<?php foreach($minutes as $minute) { ?>
 					<tr>
-						<td><?= $this->Html->link(h($minute->meeting_date), 
+						<td><?= $this->Html->link($minute->meeting_date->i18nFormat('YYYY-MM-dd'), 
 							['controller' => 'Minutes', 'action' => 'view', $minute->id]); ?>
 						</td>
 					</tr>
