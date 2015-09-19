@@ -17,7 +17,7 @@
         <legend><?= __('Edit User') ?></legend>
         <?php
             echo $this->Form->input('username');
-            echo $this->Form->input('password', ['type' => 'password', 'label' => 'Password (leave blank if you do not want to change your password)', 'value' => '']);
+            echo $this->Form->input('password', ['type' => 'password', 'required' => false, 'error' => false, 'label' => 'Password (leave blank if you do not want to change your password)', 'value' => '']);
             echo $this->Form->input('password2', ['type' => 'password', 'label' => 'Confirm Password (leave blank if you do not want to change your password)', 'value' => '']);
             echo $this->Form->input('real_name');
             echo $this->Form->input('email');

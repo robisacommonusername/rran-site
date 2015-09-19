@@ -70,6 +70,12 @@ class UsersController extends AppController
 				$this->Flash->error('Passwords do not match!');
 				return $this->redirect(['action' => 'add']);
 			}
+			//Can't patch the is_admin property, do it manually
+			if ($this->Auth->user('is_admin')){
+				$user['is_admin'] = (bool) $this->request->data['is_admin'];
+			} else {
+				$user['is_admin'] = false;
+			}
 			$user['password'] = $this->request->data['password'];
             $user = $this->Users->patchEntity($user, $this->request->data);
             if ($this->Users->save($user)) {
@@ -95,6 +101,7 @@ class UsersController extends AppController
         $user = $this->Users->get($id, [
             'contain' => []
         ]);
+
         if ($this->request->is(['patch', 'post', 'put'])) {
 			//We can't patch the password, check manually
 			$p1 = $this->request->data['password'];
@@ -106,14 +113,17 @@ class UsersController extends AppController
 					$this->Flash->error('Passwords did not match! Password not changed.');
 				}
 			}
+			//Allow changing the admin status if we are currently an admin
+            if ($this->Auth->user('is_admin')){
+				$user['is_admin'] = (bool) $this->request->data['is_admin'];
+			}
 			
-			//patch all other attributes		
+			//patch all other attributes. Unsetting is required, because otherwise
+			//patchEntity sets password to false, and save fails
+			unset($this->request->data['password']);
+			unset($this->request->data['is_admin']);	
             $user = $this->Users->patchEntity($user, $this->request->data);
             
-            //Allow changing the admin status if we are currently an admin
-            if ($this->Auth->user('is_admin')){
-				$user['is_admin'] = $this->request->data['is_admin'];
-			}
 			
             if ($this->Users->save($user)) {
                 $this->Flash->success(__('The user has been saved.'));
