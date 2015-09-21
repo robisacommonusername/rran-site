@@ -220,7 +220,7 @@ class AppController extends Controller
 		return unlink($fn);
 	}
 	
-	protected function changeUploadedFilePrivacy($hex_key, $old_private=false,$new_private=false){
+	protected function changeUploadedFilePrivacy($hex_key, $old_private=true,$new_private=true){
 		if ($old_private ^ $new_private){
 			$old_name = $this->generateUploadFileName($hex_key, $old_private);
 			$new_name = $this->generateUploadFileName($hex_key, $new_private);
