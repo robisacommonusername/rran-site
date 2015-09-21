@@ -72,6 +72,7 @@
 				echo $this->Form->input('private',
 					['label' => 'Mark this file private (accessible only by RRAN members)?',
 					'title' => 'Non-private files can be accessed by members of the public on the web',
+					'checked' => true,
 					'class' => 'has_tooltip']);
 			}
         ?>
