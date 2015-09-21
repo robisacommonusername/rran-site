@@ -76,19 +76,19 @@ class AppController extends Controller
 	}
     
     //The following methods are for handling file uploads in the application
-    public function generateUploadFileName($hex_key, $private=true){
+    protected function generateUploadFileName($hex_key, $private=true){
 		$path = $private ? 'uploads/private/' : 'uploads/';
 		$path = WWW_ROOT . $path;
 		$fn = "$path$hex_key.aes";
 		return $fn;
 	}
 	
-	public function uploadedFileExists($hex_key, $private = true){
+	protected function uploadedFileExists($hex_key, $private = true){
 		$fn = $this->generateUploadFileName($hex_key, $private);
 		return file_exists($fn);
 	}
 	
-	public function escapeHttpFilename($fn){
+	protected function escapeHttpFilename($fn){
 		//generate a "nice" filename which is safe for inclusion in
 		//a http header - no specials allowed
 		if (preg_match('/^[a-zA-Z0-9_\\- .]+/', $fn)){
@@ -99,7 +99,7 @@ class AppController extends Controller
 		return $nice_fn;
 	}
 	
-	public function escapeHttpContentType($content_type){
+	protected function escapeHttpContentType($content_type){
 		//make the content type "safe" for inclusion in headers
 		$token = '[^\s()<>@,;:\"/\[\]?.=]+'; //no spaces, no specials: http://www.w3.org/Protocols/rfc1341/4_Content-Type.html
 		$type_regex = "%^\s*(application|audio|image|message|multipart|text|video|X-$token)/($token)%";
@@ -111,7 +111,7 @@ class AppController extends Controller
 		return $safe_content_type;
 	}
 	
-    public function uploadFile($f, $private=true){
+    protected function uploadFile($f, $private=true){
 		//check for PHP error flag
 		if ($f['error'] !== UPLOAD_ERR_OK){
 			$success = false;
@@ -172,7 +172,7 @@ class AppController extends Controller
 	}
 	
 	
-	public function echoUploadedFile($hex_key, $file_name, $file_size, $file_type, $private=true){
+	protected function echoUploadedFile($hex_key, $file_name, $file_size, $file_type, $private=true){
 		//send an uploaded file to the browser, including all the headers
 		if (!$this->uploadedFileExists($hex_key, $private)){
 			header("HTTP/1.1 404 Not Found");
@@ -207,7 +207,7 @@ class AppController extends Controller
 		exit;
 	}
 	
-	public function decodeUploadedFile($hex_key, $out_fn, $private=true){
+	protected function decodeUploadedFile($hex_key, $out_fn, $private=true){
 		$fn = $this->generateUploadFileName($hex_key, $private);
 		$key = \FileEncryptor::destringify_key($hex_key);
 		$decryptor = new \FileEncryptor($key);
@@ -215,12 +215,12 @@ class AppController extends Controller
 		return $ret;
 	}
 	
-	public function deleteUploadedFile($hex_key, $private=true){
+	protected function deleteUploadedFile($hex_key, $private=true){
 		$fn = $this->generateUploadFileName($hex_key, $private);
 		return unlink($fn);
 	}
 	
-	public function changeUploadedFilePrivacy($hex_key, $old_private=false,$new_private=false){
+	protected function changeUploadedFilePrivacy($hex_key, $old_private=false,$new_private=false){
 		if ($old_private ^ $new_private){
 			$old_name = $this->generateUploadFileName($hex_key, $old_private);
 			$new_name = $this->generateUploadFileName($hex_key, $new_private);
