@@ -22,7 +22,7 @@ class Uploadedfile extends Entity
         'file_name' => true,
         'mime_type' => false,
         'file_size' => false,
-        'private' => true,
+        'private' => false,
         'tag_string' => true //computed property
     ];
     

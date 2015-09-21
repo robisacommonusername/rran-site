@@ -84,8 +84,14 @@ class UploadedfilesController extends AppController
     {
         $uploadedfile = $this->Uploadedfiles->newEntity();
         if ($this->request->is('post')) {
-			 
-			 $private = (bool) $this->request->data['private'];
+			
+			//only admin can upload public file
+			$private = true;
+			if ($this->Auth->user('is_admin')) {
+				$private = (bool) $this->request->data['private'];
+			}
+			$uploadedfile['private'] = $private;
+			
 			//process upload data
 			$ret = $this->uploadFile($this->request->data['uploaded_file'], $private);
 			if ($ret['success']){
@@ -131,11 +137,14 @@ class UploadedfilesController extends AppController
 			//Need to check for the case of changing privacy. In that
 			//case we will need to move the file
 			if (isset($this->request->data['private'])){
-				$new_private = $this->request->data['private'];
-				if ($private ^ $new_private){
+				$new_private = (bool) $this->request->data['private'];
+				$changing = $private ^ $new_private;
+				//anyone can make a file private, but only admin can make private file public
+				$change_allowed = $new_private || $this->Auth->user('is_admin');
+				if ($change_allowed && $changing){
 					$succ = $this->changeUploadedFilePrivacy($key,$private,$new_private);
-					if (!$succ){
-						$this->request->data['private'] = $private;
+					if ($succ){
+						$uploadedfile['private'] = $new_private;
 					}
 				}
 			}
