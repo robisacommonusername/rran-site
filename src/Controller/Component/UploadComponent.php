@@ -2,10 +2,50 @@
 namespace App\Controller\Component;
 require('FileEncryptor.php');
 use Cake\Controller\Component;
+use Cake\ORM\Entity;
 
 class UploadComponent extends Component {
 	
-	private function _get_encryption($f){
+	protected $_config_ = array(
+		'private' => true,
+		'encrypted' => true
+	);
+	
+	protected $_default_entity_config_ = array();
+	
+	public function initialize(array $config){
+		parent::initialize();
+		$this->mergeConfig($config);
+	}
+	
+	public function getConfig(){
+		return $this->_config_;
+	}
+	
+	public function setConfig(array $config){
+		$this->_config_ = $config;
+	}
+	
+	public function mergeConfig(array $config){
+		$this->_config_ = array_merge($this->_config_, $config);
+	}
+	
+	public function getEntityOptions($entity){
+		$class = is_string($entity) ? $entity : get_class($entity);
+		if (array_key_exists($class, $this->_default_entity_config_)){
+			$ret = $this->_default_entity_config_[$class];
+		} else {
+			$ret = [];
+		}
+		return $ret;
+	}
+	
+	public function setEntityOptions($entity, $options){
+		$class = is_string($entity) ? $entity : get_class($entity);
+		$this->_default_entity_config_[$class] = $options;
+	}
+	
+	private function _get_encryption(array $f){
 		$encrypt = false;
 		if (isset($f['encrypt'])) $encrypt = $f['encrypt'];
 		if (!isset($f['iv'])) $encrypt = false;
@@ -13,7 +53,7 @@ class UploadComponent extends Component {
 		return $encrypt;
 	}
 	
-	private function _make_file_encryptor($f){
+	private function _make_file_encryptor(array $f){
 		$encrypt = $this->_get_encryption($f);
 		$key = \FileEncryptor::destringify_key($f['key'])
 		if ($encrypt){
@@ -26,7 +66,7 @@ class UploadComponent extends Component {
 		return $encryptor;
 	}
 	
-	public function generateUploadFileName($f){
+	public function generateUploadFileName(array $f){
 		/*
 		 * $f = ['key' => key (hex format)
 		 * 	'encrypt' =>
@@ -45,12 +85,12 @@ class UploadComponent extends Component {
 		return $fn;
 	}
 	
-	public function uploadedFileExists($f){
+	public function uploadedFileExists(array $f){
 		$fn = $this->generateUploadFileName($f);
 		return file_exists($fn);
 	}
 	
-	public function escapeHttpFilename($fn){
+	public function escapeHttpFilename(string $fn){
 		//generate a "nice" filename which is safe for inclusion in
 		//a http header - no specials allowed
 		if (preg_match('/^[a-zA-Z0-9_\\- .]+/', $fn)){
@@ -61,7 +101,7 @@ class UploadComponent extends Component {
 		return $nice_fn;
 	}
 	
-	public function escapeHttpContentType($content_type){
+	public function escapeHttpContentType(string $content_type){
 		//make the content type "safe" for inclusion in headers
 		$token = '[^\s()<>@,;:\"/\[\]?.=]+'; //no spaces, no specials: http://www.w3.org/Protocols/rfc1341/4_Content-Type.html
 		$type_regex = "%^\s*(application|audio|image|message|multipart|text|video|X-$token)/($token)%";
@@ -73,7 +113,7 @@ class UploadComponent extends Component {
 		return $safe_content_type;
 	}
 	
-    public function uploadFile($f, $private=true,$encrypt=false){
+    public function uploadFile(array $f, $private=true,$encrypt=false){
 		//Here $f is in the form that comes from PHP $_FILES
 		
 		//check for PHP error flag
@@ -146,7 +186,7 @@ class UploadComponent extends Component {
 	}
 	
 	
-	public function echoUploadedFile($f, $file_name, $file_size, $file_type){
+	public function echoUploadedFile(array $f, string $file_name, int $file_size, string $file_type){
 		$private = isset($f['private']) ? $f['private'] : true;
 		
 		$encrypt = $this->_get_encryption($f);
@@ -184,7 +224,7 @@ class UploadComponent extends Component {
 		exit;
 	}
 	
-	public function decodeUploadedFile($f, $out_fn){
+	public function decodeUploadedFile(array $f, string $out_fn){
 		$encrypt = $this->_get_encryption($f);
 		
 		$fn = $this->generateUploadFileName($f);
@@ -194,12 +234,12 @@ class UploadComponent extends Component {
 		return $ret;
 	}
 	
-	public function deleteUploadedFile($f){
+	public function deleteUploadedFile(array $f){
 		$fn = $this->generateUploadFileName($f);
 		return unlink($fn);
 	}
 	
-	public function changeUploadedFilePrivacy($f,$new_private=true){
+	public function changeUploadedFilePrivacy(array $f,$new_private=true){
 		$old_private = $f['private'];
 		if ($old_private ^ $new_private){
 			$old_name = $this->generateUploadFileName($f);
@@ -246,7 +286,7 @@ class UploadComponent extends Component {
 		return false;
 	}
 	
-	private function _process_options($options){
+	private function _process_options(Entity $entity, array $opts){
 		//options:
 		/*
 		 * [
@@ -259,6 +299,10 @@ class UploadComponent extends Component {
 		 * 		
 		 */
 		 //Get the options
+		 $base_config = $this->getConfig();
+		 $entity_config = $this->getEntityOptions($entity);
+		 $options = array_merge($base_config, $entity_config, $opts);
+		 
 		 $private = array_key_exists($options,'private') ? $options['private'] : true;
 		 $encrypt = array_key_exists($options,'encrypt') ? $options['encrypt'] : false;
 		 if (array_key_exists($options, $fields)){
@@ -284,13 +328,13 @@ class UploadComponent extends Component {
 		 return array($fields, $private, $encrypt);
 	}
 	
-	public function attachToEntity($entity, $file, $options=[]){
-		
+	public function attachToEntity(Entity $entity, array $file, array $options=[]){
+		//$file is in format that comes from PHP $_FILE
 		//Get the upload options
-		 list($fields, $private, $encrypt) = $this->_process_options($options);
+		 list($fields, $private, $encrypt) = $this->_process_options($entity, $options);
 		 
 		 //Upload the file
-		 $ret = $this->uploadFile($file, $private);
+		 $ret = $this->uploadFile($file, $private, $encrypt);
 		 
 		 //set the file information on the entity
 		 if ($ret['success']){
@@ -306,8 +350,8 @@ class UploadComponent extends Component {
 		 return $ret['success'];
 	}
 	
-	private function _get_file_description_from_entity($entity, $options=[]){
-		list($fields) = $this->_process_options($options);
+	private function _get_file_description_from_entity(Entity $entity, array $options=[]){
+		list($fields) = $this->_process_options($entity, $options);
 		
 		//Determine if file is encrypted
 		if (!isset($fields['iv']
@@ -331,17 +375,17 @@ class UploadComponent extends Component {
 		return $f;
 	}
 	
-	public function detachFromEntity($entity, $options){
+	public function detachFromEntity(Entity $entity, array $options=[]){
 		
-		$f = $this->_get_file_description_from_entity($entity, $options=[]);
+		$f = $this->_get_file_description_from_entity($entity, $options);
 		
 		return $this->deleteUploadedFile($f);
 	}
 	
-	public function downloadFromEntity($entity, $options=[]){
+	public function downloadFromEntity(Entity $entity, array $options=[]){
 		//get the attached file from the entity, and send it to the browser
 		$f = $this->_get_file_description_from_entity($entity, $options);
-		list($fields) = $this->_process_options($options);
+		list($fields) = $this->_process_options($entity, $options);
 		$file_name = isset($fields['file_name']) ? $entity[$fields['file_name']] : 'unnamedfile';
 		$content_type = isset($fields['content_type']) ? $entity[$fields['content_type']] : 'application/octet-stream';
 		if (isset($fields['file_size'])){
