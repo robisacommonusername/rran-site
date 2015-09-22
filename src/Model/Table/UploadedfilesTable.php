@@ -64,6 +64,9 @@ class UploadedfilesTable extends Table
         $validator
             ->add('private', 'valid', ['rule' => 'boolean'])
             ->allowEmpty('private');
+            
+        $validator
+			->allowEmpty('description');
 
         return $validator;
     }

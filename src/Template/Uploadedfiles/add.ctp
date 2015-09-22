@@ -1,6 +1,8 @@
 <script>
 	$(document).ready(function(e){
-		$('.has_tooltip').tooltip();
+		$('.has_tooltip').tooltip({
+			position: {my: "right top+15", at: "right bottom", collision: "flipfit"}
+		});
 		
 		function split( val ) {
 	      return val.split( /,\s*/ );
@@ -63,6 +65,9 @@
         <legend><?= __('Upload file to shared drive') ?></legend>
         <?php
             echo $this->Form->file('uploaded_file');
+            echo $this->Form->input('description',
+				['title' => 'A brief description of the file you are uploading. This description will be published along with the link if you are uploading a publicly accessible file',
+				'class' => 'has_tooltip']);
             echo $this->Form->input('tag_string', 
 				['type' => 'text',
 				'label' => 'Tags for this file (enter as comma separated list)',
