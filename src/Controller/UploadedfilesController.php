@@ -40,11 +40,38 @@ class UploadedfilesController extends AppController
      
      //Set up authorisations
      public function isAuthorized($user){
-		 //Everyone who is logged in can view, add, edit, delete (for now)
+		 //Admin can do everything
+		 if ($user['is_admin']){
+			 return true;
+		 }
 		 
-		 //Prevent non-admin users from changing the private property
-		 //or the description on a public file
-		 return true;
+		 //Anyone can use the public view method
+		 if ($this->request->action === 'public_view'){
+			 return true;
+		 }
+		 
+		 //Non-admin can perform all actions on a private (but pre-existing) file
+		 if (!$user['is_admin'] && in_array($this->request->action, ['edit','view','delete'])) {
+			 $file_id = (int) $this->request->params['pass'][0];
+			 $uploadedfile = $this->Uploadedfiles->get($file_id);
+			 if ($uploadedfile['private']) {
+				 return true;
+			 }
+		 }
+		 
+		 //Non-admin can also add a file, provided the data passed in the
+		 //request specifies that the file is to be private
+		 if (!$user['is_admin'] && $this->request->action === 'add' && $this->request->data['private']){
+			 return true;
+		 }
+		 
+		 //Public file by non-admin user can only be viewed
+		 if (!$user['is_admin'] && $this->request->action === 'view' && !$uploadedfile['private']){
+			 return true;
+		 }
+		 
+		 //Everything else is forbidden
+		 return false;
 	 }
 	 
     public function index()
@@ -136,20 +163,14 @@ class UploadedfilesController extends AppController
         $uploadedfile = $this->Uploadedfiles->get($id, [
             'contain' => ['Tags']
         ]);
-        $key = $uploadedfile['content_key'];
-        $private = $uploadedfile['private'];
+
         if ($this->request->is(['patch', 'post', 'put'])) {
 			
 			//Need to check for the case of changing privacy. In that
 			//case we will need to move the file
 			if (isset($this->request->data['private'])){
 				$new_private = (bool) $this->request->data['private'];
-				$changing = $private ^ $new_private;
-				//anyone can make a file private, but only admin can make private file public
-				$change_allowed = $new_private || $this->Auth->user('is_admin');
-				if ($change_allowed && $changing){
-					$uploadedfile = $this->Upload->setEntityAttachmentPrivacy($uploadedfile, $new_private);
-				}
+				$uploadedfile = $this->Upload->setEntityAttachmentPrivacy($uploadedfile, $new_private);
 			}
 			
             $uploadedfile = $this->Uploadedfiles->patchEntity($uploadedfile, $this->request->data);
