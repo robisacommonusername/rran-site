@@ -55,10 +55,17 @@ class FileEncryptor{
 		return substr($bytes,0,16);
 	}
 	
+	public static function generate_iv(){
+		//In our case, since we're using AES-128, the IV and key have 
+		//the same size, but in general we will need separate function
+		//for generating IVs and keys
+		return FileEncryptor::generate_key();
+	}
+	
 	public static function stringify_key($key){
 		//return binary string $key (16 bytes) as hex encoded string (32 characters)
 		$s = unpack('H*', $key);
-		return substr($s[1], 0, 32);
+		return $s[1];
 	}
 	
 	public static function destringify_key($hex_key){
@@ -250,6 +257,28 @@ class FileEncryptor{
 		}
 		
 		return $out_fps;
+	}
+	
+	public function decrypted_filesize($fn){
+		//get the size of the decrypted file in bytes
+		$encrypted_size = filesize($fn);
+		$f = fopen($fn, 'r');
+		//check for the special case where the ciphertext is only one
+		//block => message < 16 bytes
+		if ($encrypted_size >= 32){
+			//IV will be the second last ciphertext block
+			fseek($f, $encrypted_size-32);
+			$this->next_iv = fread($f,16);
+		} else {
+			$this->next_iv = $this->iv;
+		}
+		$last_ct_block = fread($f,16);
+		$last_block = $this->_decrypt_chunk($last_ct_block, true);
+		$n_pad = ord($last_block[15]);
+		
+		$plain_size = $encrypted_size - $n_pad;
+		
+		return $plain_size;
 	}
 }
 ?>
