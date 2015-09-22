@@ -280,10 +280,8 @@ class UploadComponent extends Component {
 				unlink($old_name);
 			}
 			
-			return $f;
-			
 		}
-		return false;
+		return $f;
 	}
 	
 	private function _process_options(Entity $entity, array $opts){
@@ -347,7 +345,7 @@ class UploadComponent extends Component {
 				
 		 }
 		 
-		 return $ret['success'];
+		 return $ret;
 	}
 	
 	private function _get_file_description_from_entity(Entity $entity, array $options=[]){
@@ -401,6 +399,21 @@ class UploadComponent extends Component {
 		}
 		
 		$this->echoUploadedFile($f, $file_name, $file_size, $content_type);
+	}
+	
+	public function setEntityAttachmentPrivacy(Entity $entity, $new_private=true, $options=[]){
+		$f = $this->_get_file_description_from_entity($entity, $options);
+		$new_f = $this->changeUploadedFilePrivacy($f, new_private);
+		//new_f is almost certainly the same $f, but maybe the key or iv have changed
+		//in this very rare case, we may need to modify the entity
+		list($fields) = $this->_process_options($entity, $options);
+		
+		$entity[$fields['private']] = $new_private;
+		
+		if ($f['key'] !== $new_f['key']) $entity[$fields['key']] = $new_f['key'];
+		if ($f['encrypt'] && $f['iv'] !== $new_f['iv']) $entity[$fields['iv']] = $new_f['iv'];
+		
+		return $entity;
 	}
 }
 ?>

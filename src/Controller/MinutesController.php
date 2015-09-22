@@ -10,6 +10,17 @@ use App\Controller\AppController;
  */
 class MinutesController extends AppController
 {
+	public function initialize(){
+		parent:initialize();
+		$this->loadComponent('Upload', ['private' => true,
+				'encrypt' => false,
+				'fields' => [
+					'key' => 'content_key',
+					'content_type' => 'mime_type',
+					'file_name', 'file_size'
+				]]
+			);
+	}
     /**
      * Index method
      *
@@ -72,24 +83,17 @@ class MinutesController extends AppController
 					$minute['content'] = '';
 				}
 			}
+			
+			//set meeting date
+			$date = new \DateTime($this->request->data['meeting_date']);
+			$minute['meeting_date'] = $date;
+			
             //process upload data. Always set to private
-			$ret = $this->uploadFile($f, true);
+            $ret = $this->Upload->attachToEntity($minute, $f, ['private' => true]);
 			
-			
-			if ($ret['success']){
-				//$minute = $this->Minutes->patchEntity($minute, $this->request->data);
-				$date = new \DateTime($this->request->data['meeting_date']);
-				$minute['meeting_date'] = $date;
-				
-				$minute['mime_type'] = $ret['content_type'];
-				$minute['file_size'] = $ret['file_size'];
-				$minute['file_name'] = $ret['display_name'];
-				$minute['content_key'] = $ret['key'];
-				
-				if ($this->Minutes->save($minute)){
-					 $this->Flash->success(__('The minutes have been saved.'));
-					return $this->redirect(['action' => 'index']);
-				}
+			if ($ret['success'] && $this->Minutes->save($minute)){
+				$this->Flash->success(__('The minutes have been saved.'));
+				return $this->redirect(['action' => 'index']);
 			}
 			
 			//if we haven't been re-directed yet, we've failed
@@ -113,13 +117,13 @@ class MinutesController extends AppController
             'contain' => []
         ]);
         if ($this->request->is(['patch', 'post', 'put'])) {
-            //$minute = $this->Minutes->patchEntity($minute, $this->request->data);
-            if (strlen($this->request->data['meeting_date']) > 0){
+            if (isset($this->request->data['meeting_date'])){
 				$minute['meeting_date'] = new \DateTime($this->request->data['meeting_date']);
 			}
-			if (strlen($this->request->data['content']) > 0){
-				$minute['content'] = $this->request->data['content'];
-			}
+			
+			unset($this->request->data['meeting_date']);
+			$minute = $this->Minutes->patchEntity($minute, $this->request->data);
+			
             if ($this->Minutes->save($minute)) {
                 $this->Flash->success(__('The minute has been saved.'));
                 return $this->redirect(['action' => 'index']);
@@ -142,16 +146,13 @@ class MinutesController extends AppController
     {
         $this->request->allowMethod(['post', 'delete']);
         $minute = $this->Minutes->get($id);
-        $key = $minute['content_key'];
-        $private = true;
-        if ($this->Minutes->delete($minute) && $this->deleteUploadedFile($key, $private)) {
+        if ($this->Minutes->delete($minute) && 
+			$this->Upload->detachFromEntity($minute, ['private' => true])){
+				
             $this->Flash->success(__('The minute has been deleted.'));
         } else {
             $this->Flash->error(__('The minute could not be deleted. Please, try again.'));
         }
         return $this->redirect(['action' => 'index']);
     }
-    
-    public function search(){
-	}
 }

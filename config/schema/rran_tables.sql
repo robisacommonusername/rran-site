@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS uploadedfiles (
   file_size integer,
   private boolean default false,
   content_key varchar(32),
+  description text,
   created timestamp,
   modified timestamp,
   PRIMARY KEY (id)

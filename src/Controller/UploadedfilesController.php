@@ -21,6 +21,15 @@ class UploadedfilesController extends AppController
 	public function initialize(){
 		parent::initialize();
 		$this->loadModel('Tags');
+		$this->loadComponent('Upload', ['private' => true,
+			'encrypt' => false,
+			'fields' => [
+				'key' => 'content_key',
+				'content_type' => 'mime_type',
+				'file_name', 'file_size'
+			]]
+		);
+				
 	}
 
     /**
@@ -32,6 +41,9 @@ class UploadedfilesController extends AppController
      //Set up authorisations
      public function isAuthorized($user){
 		 //Everyone who is logged in can view, add, edit, delete (for now)
+		 
+		 //Prevent non-admin users from changing the private property
+		 //or the description on a public file
 		 return true;
 	 }
 	 
@@ -71,7 +83,7 @@ class UploadedfilesController extends AppController
         ]);
         //$this->set('uploadedfile', $uploadedfile);
         //$this->set('_serialize', ['uploadedfile']);
-        $this->fetch($uploadedfile);
+        $this->downloadFromEntity($uploadedfile);
         
     }
 
@@ -90,22 +102,16 @@ class UploadedfilesController extends AppController
 			if ($this->Auth->user('is_admin')) {
 				$private = (bool) $this->request->data['private'];
 			}
-			$uploadedfile['private'] = $private;
 			
-			//process upload data
-			$ret = $this->uploadFile($this->request->data['uploaded_file'], $private);
-			if ($ret['success']){
-				$uploadedfile = $this->Uploadedfiles->patchEntity($uploadedfile, $this->request->data);
-				//private doesn't seem to work with patchEntity
-				$uploadedfile['mime_type'] = $ret['content_type'];
-				$uploadedfile['file_size'] = $ret['file_size'];
-				$uploadedfile['file_name'] = $ret['display_name'];
-				$uploadedfile['content_key'] = $ret['key'];
-				
-				if ($this->Uploadedfiles->save($uploadedfile)){
-					 $this->Flash->success(__('The uploaded file has been saved.'));
-					return $this->redirect(['action' => 'index']);
-				}
+			//Attach file to the $uploadedfile entity
+			$ret = $this->Upload->attachToEntity($uploadedfile,
+				$this->request->data['uploaded_file'],
+				['private' => $private]
+			);
+			
+			if ($ret['success'] && $this->Uploadedfiles->save($uploadedfile)){
+				$this->Flash->success(__('The uploaded file has been saved.'));
+				return $this->redirect(['action' => 'index']);
 			}
 			
 			//if we haven't been re-directed yet, we've failed
@@ -142,10 +148,7 @@ class UploadedfilesController extends AppController
 				//anyone can make a file private, but only admin can make private file public
 				$change_allowed = $new_private || $this->Auth->user('is_admin');
 				if ($change_allowed && $changing){
-					$succ = $this->changeUploadedFilePrivacy($key,$private,$new_private);
-					if ($succ){
-						$uploadedfile['private'] = $new_private;
-					}
+					$uploadedfile = $this->Upload->setEntityAttachmentPrivacy($uploadedfile, $new_private);
 				}
 			}
 			
@@ -174,9 +177,9 @@ class UploadedfilesController extends AppController
     {
         $this->request->allowMethod(['post', 'delete']);
         $uploadedfile = $this->Uploadedfiles->get($id);
-        $key = $uploadedfile['content_key'];
-        $private = $uploadedfile['private'];
-        if ($this->Uploadedfiles->delete($uploadedfile) && $this->deleteUploadedFile($key, $private)) {
+        if ($this->Uploadedfiles->delete($uploadedfile) &&
+			$this->Upload->detachFromEntity($entity)){
+				
             $this->Flash->success(__('The uploaded file has been deleted.'));
         } else {
             $this->Flash->error(__('The uploaded file could not be deleted. Please, try again.'));
@@ -189,19 +192,10 @@ class UploadedfilesController extends AppController
 		//used for public viewing of public files
 		$uploadedfile = $this->Uploadedfiles->get($id);
 		if (!$uploadedfile['private']) {
-			$this->fetch($uploadedfile);
+			$this->Upload->downloadFromEntity($uploadedfile);
 		} else {
 			die('You do not have permission to access this file');
 		}
-	}
-	
-	protected function fetch($uploadedfile){
-		$key = $uploadedfile['content_key']; 
-        $private = $uploadedfile['private'];
-        $fn = $uploadedfile['file_name'];
-        $file_type = $uploadedfile['mime_type'];
-        $file_size = $uploadedfile['file_size'];
-        $this->echoUploadedFile($key, $fn, $file_size, $file_type, $private);
 	}
     
 }
