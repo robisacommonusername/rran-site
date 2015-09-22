@@ -57,8 +57,9 @@ class AppController extends Controller
         ]);
         
         // Allow the display action so our pages controller
-        // continues to work. Allow any public controller actions
-        $this->Auth->allow(['display']);
+        // continues to work. We don't actually use the pages controller
+        //so disable this for now
+        //$this->Auth->allow(['display']);
     }
     
     //allow us to get the user information in the view

@@ -208,7 +208,7 @@ class UploadedfilesController extends AppController
         return $this->redirect(['action' => 'index']);
     }
     
-    public function display($id = null){
+    public function public_view($id = null){
 		//essentially the same as view, but can be done without authentication
 		//used for public viewing of public files
 		$uploadedfile = $this->Uploadedfiles->get($id);

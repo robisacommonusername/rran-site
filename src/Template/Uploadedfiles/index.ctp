@@ -34,7 +34,7 @@
 				<?= $this->Tag->tagLinks($uploadedfile->tags); ?>
             </td>
             <td class="actions">
-				<?= $uploadedfile->private ? '' : $this->Html->link(__('Public link'), ['action' => 'display', $uploadedfile->id]); ?>
+				<?= $uploadedfile->private ? '' : $this->Html->link(__('Public link'), ['action' => 'public_view', $uploadedfile->id]); ?>
                 <?= $this->Html->link(__('Edit'), ['action' => 'edit', $uploadedfile->id]) ?>
                 <?= $this->Form->postLink(__('Delete'), ['action' => 'delete', $uploadedfile->id], ['confirm' => __('Are you sure you want to delete # {0}?', $uploadedfile->id)]) ?>
             </td>
