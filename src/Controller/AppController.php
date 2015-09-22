@@ -13,7 +13,6 @@
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */ 
 namespace App\Controller;
-require('Component/FileEncryptor.php');
 use Cake\Controller\Controller;
 use Cake\I18n\Time;
 /**

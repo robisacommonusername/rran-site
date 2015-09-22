@@ -26,7 +26,7 @@ class UploadedfilesController extends AppController
 			'fields' => [
 				'key' => 'content_key',
 				'content_type' => 'mime_type',
-				'file_name', 'file_size'
+				'file_name', 'file_size', 'private'
 			]]
 		);
 				
@@ -110,7 +110,7 @@ class UploadedfilesController extends AppController
         ]);
         //$this->set('uploadedfile', $uploadedfile);
         //$this->set('_serialize', ['uploadedfile']);
-        $this->downloadFromEntity($uploadedfile);
+        $this->Upload->downloadFromEntity($uploadedfile);
         
     }
 
@@ -199,7 +199,7 @@ class UploadedfilesController extends AppController
         $this->request->allowMethod(['post', 'delete']);
         $uploadedfile = $this->Uploadedfiles->get($id);
         if ($this->Uploadedfiles->delete($uploadedfile) &&
-			$this->Upload->detachFromEntity($entity)){
+			$this->Upload->detachFromEntity($uploadedfile)){
 				
             $this->Flash->success(__('The uploaded file has been deleted.'));
         } else {
