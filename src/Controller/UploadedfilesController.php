@@ -45,18 +45,18 @@ class UploadedfilesController extends AppController
 			 return true;
 		 }
 		 
-		 //Anyone can use the public view method
-		 if ($this->request->action === 'public_view'){
-			 return true;
+		 $file_id = (int) $this->request->params['pass'][0];
+		 $uploadedfile = $this->Uploadedfiles->get($file_id);
+		 
+		 //Anyone can use the public view method on a public file
+		 if ($this->request->action === 'public_view' && !$uploadedfile['private']){
+			return true;
 		 }
 		 
 		 //Non-admin can perform all actions on a private (but pre-existing) file
-		 if (!$user['is_admin'] && in_array($this->request->action, ['edit','view','delete'])) {
-			 $file_id = (int) $this->request->params['pass'][0];
-			 $uploadedfile = $this->Uploadedfiles->get($file_id);
-			 if ($uploadedfile['private']) {
+		 if (!$user['is_admin'] && in_array($this->request->action, ['edit','view','delete'])
+			&& $uploadedfile['private']) {
 				 return true;
-			 }
 		 }
 		 
 		 //Non-admin can also add a file, provided the data passed in the
@@ -66,7 +66,8 @@ class UploadedfilesController extends AppController
 		 }
 		 
 		 //Public file by non-admin user can only be viewed
-		 if (!$user['is_admin'] && $this->request->action === 'view' && !$uploadedfile['private']){
+		 if (!$user['is_admin'] && $this->request->action === 'view'
+			&& !$uploadedfile['private']){
 			 return true;
 		 }
 		 
