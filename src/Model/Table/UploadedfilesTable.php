@@ -30,6 +30,15 @@ class UploadedfilesTable extends Table
         $this->primaryKey('id');
 
         $this->addBehavior('Timestamp');
+        $this->addBehavior('Uploadable', [
+			'private' => true,
+			'encrypted' => false,
+			'fields' => [
+				'content_type' => 'mime_type',
+				'key' => 'content_key',
+				'file_name', 'file_size', 'private'
+			]
+		]);
 
         $this->belongsToMany('Tags', [
             'foreignKey' => 'uploadedfile_id',

@@ -8,6 +8,7 @@ use Cake\ORM\Entity;
  */
 class Minute extends Entity
 {
+	use UploadableTrait;
 
     /**
      * Fields that can be mass assigned using newEntity() or patchEntity().

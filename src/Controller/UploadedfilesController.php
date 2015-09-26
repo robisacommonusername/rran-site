@@ -130,11 +130,16 @@ class UploadedfilesController extends AppController
 				$private = (bool) $this->request->data['private'];
 			}
 			
+			//set data on entity
+			$uploadedfile = $this->Uploadedfiles->patchEntity($uploadedfile, $this->request->data);
+			$uploadedfile['private'] = $private;
+			
 			//Attach file to the $uploadedfile entity
 			$ret = $this->Upload->attachToEntity($uploadedfile,
 				$this->request->data['uploaded_file'],
 				['private' => $private]
 			);
+			
 			
 			if ($ret['success'] && $this->Uploadedfiles->save($uploadedfile)){
 				$this->Flash->success(__('The uploaded file has been saved.'));

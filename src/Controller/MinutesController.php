@@ -11,7 +11,7 @@ use App\Controller\AppController;
 class MinutesController extends AppController
 {
 	public function initialize(){
-		parent:initialize();
+		parent::initialize();
 		$this->loadComponent('Upload', ['private' => true,
 				'encrypt' => false,
 				'fields' => [
@@ -53,15 +53,8 @@ class MinutesController extends AppController
         $minute = $this->Minutes->get($id, [
             'contain' => []
         ]);
-        //$this->set('minute', $minute);
-        //$this->set('_serialize', ['minute']);
-        $key = $minute['content_key'];
-        $private = true;
-        $fn = $minute['file_name'];
-        $file_type = $minute['mime_type'];
-        $file_size = $minute['file_size'];
         
-        $this->echoUploadedFile($key, $fn, $file_size, $file_type, $private);
+        $this->Upload->downloadFromEntity($minute);
     }
 
     /**
@@ -89,7 +82,7 @@ class MinutesController extends AppController
 			$minute['meeting_date'] = $date;
 			
             //process upload data. Always set to private
-            $ret = $this->Upload->attachToEntity($minute, $f, ['private' => true]);
+            $ret = $this->Upload->attachToEntity($minute, $f);
 			
 			if ($ret['success'] && $this->Minutes->save($minute)){
 				$this->Flash->success(__('The minutes have been saved.'));
@@ -147,7 +140,7 @@ class MinutesController extends AppController
         $this->request->allowMethod(['post', 'delete']);
         $minute = $this->Minutes->get($id);
         if ($this->Minutes->delete($minute) && 
-			$this->Upload->detachFromEntity($minute, ['private' => true])){
+			$this->Upload->detachFromEntity($minute)){
 				
             $this->Flash->success(__('The minute has been deleted.'));
         } else {

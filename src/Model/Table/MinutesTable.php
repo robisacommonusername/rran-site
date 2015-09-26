@@ -29,6 +29,15 @@ class MinutesTable extends Table
         $this->primaryKey('id');
         
         $this->addBehavior('Timestamp');
+        $this->addBehavior('Uploadable', [
+			'private' => true,
+			'encrypt' => false,
+			'fields' => [
+				'content_type' => 'mime_type',
+				'key' => 'content_key',
+				'file_name', 'file_size'
+			]
+		]);
 
     }
 
