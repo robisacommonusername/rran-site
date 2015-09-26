@@ -10,6 +10,8 @@ class UploadComponent extends Component {
 		'private' => true,
 		'encrypted' => true,
 		'max_size' => '30MB',
+		'default_file_name' => 'unnamed_file',
+		'default_content_type' => 'application/octet-stream',
 		'directory' => '#{WWW_ROOT}/uploads',
 		'private_directory' => '#{WWW_ROOT}/uploads/private'
 	];
@@ -414,8 +416,30 @@ class UploadComponent extends Component {
 	public function downloadFromEntity(Entity $entity,$options=[]){
 		//get the attached file from the entity, and send it to the browser
 		$f = $entity->getAttachmentDescription();
-		$file_name = isset($f['file_name']) ? $f['file_name']: 'unnamedfile';
-		$content_type = isset($f['content_type']) ? $f['content_type'] : 'application/octet-stream';
+		
+		//determine file name
+		if (isset($f['file_name'])){
+			$file_name = $f['file_name'];
+		} else {
+			if (isset($this->_config_['default_file_name'])) {
+				$file_name = $this->_config_['default_file_name'];
+			} else {
+				$file_name = 'unnamed_file';
+			}
+		}
+		
+		//Determine content type
+		if (isset($f['content_type'])){
+			$content_type = $f['content_type'];
+		} else {
+			if (isset($this->_config_['default_content_type'])) {
+				$content_type = $this->_config_['default_content_type'];
+			} else {
+				$content_type = 'application/octet-stream';
+			}
+		}
+		
+		//Determine file size
 		if (isset($f['file_size'])){
 			$file_size = $f['file_size'];
 		} else {

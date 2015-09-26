@@ -31,7 +31,7 @@ class MinutesTable extends Table
         $this->addBehavior('Timestamp');
         $this->addBehavior('Uploadable', [
 			'private' => true,
-			'encrypt' => false,
+			'encrypted' => false,
 			'fields' => [
 				'content_type' => 'mime_type',
 				'key' => 'content_key',
