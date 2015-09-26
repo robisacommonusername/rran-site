@@ -38,24 +38,10 @@
 	            <th><?= __('Modified') ?></th>
 	            <th class="actions"><?= __('Actions') ?></th>
 	        </tr>
-	        <?php foreach ($tag->uploadedfiles as $uploadedfiles): ?>
-	        <tr>
-	            <td><?= $this->Html->link(h($uploadedfiles->file_name),
-	             ['controller' => 'Uploadedfiles', 'action' => 'view', $uploadedfiles->id]) ?></td>
-	            <td><?= $this->Number->toReadableSize($uploadedfiles->file_size) ?></td>
-	            <td><?= h($uploadedfiles->private ? 'Private' : 'Public') ?></td>
-	            <td><?= h($uploadedfiles->modified ? $uploadedfiles->modified : $uploadedfiles->created) ?></td>
-	
-	            <td class="actions">
-	
-	                <?= $this->Html->link(__('Edit'), ['controller' => 'Uploadedfiles', 'action' => 'edit', $uploadedfiles->id]) ?>
-	
-	                <?= $this->Form->postLink(__('Delete'), ['controller' => 'Uploadedfiles', 'action' => 'delete', $uploadedfiles->id], ['confirm' => __('Are you sure you want to delete # {0}?', $uploadedfiles->id)]) ?>
-	
-	            </td>
-	        </tr>
-	
-	        <?php endforeach; ?>
+	        <?php foreach ($tag->uploadedfiles as $uploadedfile) {
+				echo $this->Uploadedfile->renderRow($uploadedfile,
+					['file_name', 'file_size', 'is_private', 'modified', 'actions']);
+	        } ?>
 	    </table>
 	    <?php endif; ?>
 	    </div>

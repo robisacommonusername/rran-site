@@ -57,20 +57,10 @@
 				</tr>
 			</thead>
 			<tbody>
-				<?php foreach($files as $file) { ?>
-					<tr>
-						<td>
-							<?= $this->Html->link(h($file->file_name),
-							['controller' => 'Uploadedfiles', 'action' => 'view', $file->id]) ?>
-						</td>
-						<td>
-							<?= $this->Number->toReadableSize($file->file_size) ?>
-						</td>
-						<td class="tags">
-							<?= $this->Tag->tagLinks($file->tags) ?>
-						</td>
-					</tr>
-				<?php } ?>
+				<?php foreach($files as $file) {
+					echo $this->Uploadedfile->renderRow($file,
+						['file_name', 'file_size', 'tags']);
+				} ?>
 			</tbody>
 		</table>
 	<?php } ?>

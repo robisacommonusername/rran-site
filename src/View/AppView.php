@@ -34,5 +34,6 @@ class AppView extends View
 		$this->loadHelper('Tag');
 		$this->loadHelper('Sidebar');
 		$this->loadHelper('Search');
+		$this->loadHelper('Uploadedfile');
     }
 }
