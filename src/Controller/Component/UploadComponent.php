@@ -250,7 +250,7 @@ class UploadComponent extends Component {
 		
 		//generate random file name for encrypted file, which will also
 		//be the encryption key
-		$iv = call_user_func_array('pack', array_pad(['C*'], 17, 0)); //default is all 0
+		$iv = FileEncryptor::pack('C*', array_pad([], 16, 0)); //default is all 0
 		$up = array('private' => $private, 'encrypted' => $encrypt);
 		do {
 			$key = FileEncryptor::generate_key();
@@ -284,7 +284,8 @@ class UploadComponent extends Component {
 		
 		$ret = array('success' => $success, 'message' => $message,
 			'key' => $up['key'], 'name' => $fn, 'file_name' => $nice_fn, 
-			'content_type' => $safe_content_type, 'file_size' => $f['size']);
+			'content_type' => $safe_content_type, 'file_size' => $f['size'],
+			'private' => $private, 'encrypted' => $encrypt);
 		
 		$ret['iv'] = FileEncryptor::stringify_key($iv);
 		
