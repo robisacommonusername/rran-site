@@ -8,7 +8,7 @@ use Cake\Collection\Collection;
  */
 class Uploadedfile extends Entity
 {
-
+	use UploadableTrait;
     /**
      * Fields that can be mass assigned using newEntity() or patchEntity().
      * Note that '*' is set to true, which allows all unspecified fields to be
@@ -22,7 +22,7 @@ class Uploadedfile extends Entity
         'file_name' => true,
         'mime_type' => false,
         'file_size' => false,
-        'private' => false,
+        'private' => true,
         'description' => true,
         'tag_string' => true //computed property
     ];
